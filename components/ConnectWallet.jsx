@@ -8,28 +8,36 @@ export default function ConnectWallet() {
   const [wallet, setWallet] = useState(null);
 
   const connectWalletAndPay = async () => {
-    if (!window.ethereum) return alert("Please install MetaMask first.");
+    try {
+      if (!window.ethereum) {
+        alert("Please install MetaMask first.");
+        return;
+      }
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const accounts = await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const accounts = await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
 
-    const tx = await signer.sendTransaction({
-      to: process.env.NEXT_PUBLIC_ADMIN_WALLET,
-      value: ethers.utils.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)
-    });
+      const tx = await signer.sendTransaction({
+        to: process.env.NEXT_PUBLIC_ADMIN_WALLET,
+        value: ethers.utils.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)
+      });
 
-    await tx.wait();
+      await tx.wait();
 
-    await supabase.from('participaciones').insert({
-      wallet: accounts[0],
-      is_bomb: false,
-      tx_hash: tx.hash,
-      eth_pagado: parseFloat(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)
-    });
+      await supabase.from('participaciones').insert({
+        wallet: accounts[0],
+        is_bomb: false,
+        tx_hash: tx.hash,
+        eth_pagado: parseFloat(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)
+      });
 
-    setWallet(accounts[0]);
-    alert("Payment confirmed. You can now play!");
+      setWallet(accounts[0]);
+      alert("Payment confirmed. You can now play!");
+    } catch (error) {
+      console.error(error);
+      alert("Error: " + (error.message || "Transaction rejected or failed."));
+    }
   };
 
   return (
