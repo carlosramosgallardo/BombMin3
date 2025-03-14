@@ -14,25 +14,30 @@ export default function ConnectWallet() {
         return;
       }
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-      const tx = await signer.sendTransaction({
+      const transactionParameters = {
         to: process.env.NEXT_PUBLIC_ADMIN_WALLET,
-        value: ethers.utils.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)
+        value: ethers.utils.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)._hex,
+      };
+
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
       });
 
-      await tx.wait();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const userAddress = await signer.getAddress();
 
       await supabase.from('participaciones').insert({
-        wallet: accounts[0],
+        wallet: userAddress,
         is_bomb: false,
-        tx_hash: tx.hash,
+        tx_hash: txHash,
         eth_pagado: parseFloat(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)
       });
 
-      setWallet(accounts[0]);
+      setWallet(userAddress);
       alert("Payment confirmed. You can now play!");
     } catch (error) {
       console.error(error);
