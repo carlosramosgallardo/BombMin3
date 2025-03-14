@@ -13,30 +13,30 @@ export default function ConnectWallet() {
         alert("Please install MetaMask first.");
         return;
       }
-
+  
       await window.ethereum.request({ method: 'eth_requestAccounts' });
-
+  
       const transactionParameters = {
         to: process.env.NEXT_PUBLIC_ADMIN_WALLET,
-        value: ethers.utils.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)._hex,
+        value: ethers.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE).toString(),
       };
-
+  
       const txHash = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [transactionParameters],
       });
-
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+  
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
       const userAddress = await signer.getAddress();
-
+  
       await supabase.from('participaciones').insert({
         wallet: userAddress,
         is_bomb: false,
         tx_hash: txHash,
         eth_pagado: parseFloat(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE)
       });
-
+  
       setWallet(userAddress);
       alert("Payment confirmed. You can now play!");
     } catch (error) {
@@ -44,7 +44,7 @@ export default function ConnectWallet() {
       alert("Error: " + (error.message || "Transaction rejected or failed."));
     }
   };
-
+  
   return (
     <div className="mt-4">
       {wallet ? (
