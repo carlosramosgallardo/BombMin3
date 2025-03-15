@@ -1,7 +1,7 @@
 // components/ConnectWallet.jsx
 'use client';
 import { useState } from 'react';
-import { ethers } from 'ethers';
+import { BrowserProvider, parseEther } from 'ethers';
 import { supabase } from '@/lib/supabase';
 
 export default function ConnectWallet() {
@@ -15,13 +15,13 @@ export default function ConnectWallet() {
         return;
       }
 
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const userAddress = await signer.getAddress();
 
       const tx = {
         to: process.env.NEXT_PUBLIC_ADMIN_WALLET,
-        value: ethers.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE),
+        value: parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE),
       };
 
       // Estimar el gas antes de enviar la transacción
@@ -40,15 +40,15 @@ export default function ConnectWallet() {
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 text-center">
       {wallet ? (
         <div>
           <p>Connected wallet: {wallet}</p>
           {txHash && <p>Transaction pending: {txHash}</p>}
         </div>
       ) : (
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={connectWalletAndPay}>
-          Connect MetaMask and pay 0.00001 ETH to participate in mining
+        <button className="bg-blue-500 text-white px-6 py-3 rounded text-lg" onClick={connectWalletAndPay}>
+          Connect MetaMask & Pay 0.00001 ETH
         </button>
       )}
     </div>
