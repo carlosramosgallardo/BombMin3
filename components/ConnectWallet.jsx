@@ -24,6 +24,10 @@ export default function ConnectWallet() {
         value: ethers.parseEther(process.env.NEXT_PUBLIC_PARTICIPATION_PRICE),
       };
 
+      // Estimar el gas antes de enviar la transacción
+      const estimatedGas = await provider.estimateGas(tx);
+      tx.gasLimit = estimatedGas;
+
       const txResponse = await signer.sendTransaction(tx);
       setTxHash(txResponse.hash);
       setWallet(userAddress);
@@ -31,7 +35,7 @@ export default function ConnectWallet() {
       alert("Transaction submitted. Please approve it in MetaMask.");
     } catch (error) {
       console.error(error);
-      alert("Error: " + (error.message || 'Transaction rejected or failed.'));
+      alert("Error: " + (error.message || "Transaction rejected or failed."));
     }
   };
 
