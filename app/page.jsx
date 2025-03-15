@@ -6,8 +6,8 @@ import Board from '@/components/Board';
 
 export default function Home() {
   return (
-    <main className="p-6 bg-black text-white font-mono min-h-screen">
-      <h1 className="text-2xl font-bold">BombMin3</h1>
+    <main className="p-6 bg-black text-white font-mono min-h-screen flex flex-col items-center justify-center text-lg">
+      <h1 className="text-4xl font-bold mb-6">BombMin3</h1>
       <ConnectWallet />
       <TokenValue />
       <Board />
