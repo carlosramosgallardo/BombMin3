@@ -1,4 +1,3 @@
-
 // components/ConnectWallet.jsx
 'use client';
 import { useState } from 'react';
@@ -32,7 +31,7 @@ export default function ConnectWallet() {
       alert("Transaction submitted. Please approve it in MetaMask.");
     } catch (error) {
       console.error(error);
-      alert("Error: " + (error.message || "Transaction rejected or failed."));
+      alert("Error: " + (error.message || 'Transaction rejected or failed.'));
     }
   };
 
